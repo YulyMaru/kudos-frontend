@@ -51,8 +51,12 @@ describe('KudoService', () => {
   });
 
   it('consulta las categorías activas', () => {
-    servicio.categorias().subscribe();
+    let categorias: unknown;
+    servicio.categorias().subscribe((respuesta) => (categorias = respuesta));
 
-    http.expectOne(`${api}/categorias`).flush([{ id: 'c1', nombre: 'Liderazgo' }]);
+    const peticion = http.expectOne(`${api}/categorias`);
+    expect(peticion.request.method).toBe('GET');
+    peticion.flush([{ id: 'c1', nombre: 'Liderazgo' }]);
+    expect(categorias).toEqual([{ id: 'c1', nombre: 'Liderazgo' }]);
   });
 });

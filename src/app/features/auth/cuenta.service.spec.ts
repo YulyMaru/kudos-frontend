@@ -19,11 +19,19 @@ describe('CuentaService', () => {
   afterEach(() => http.verify());
 
   it('consulta el catálogo de facultades y programas', () => {
-    servicio.facultades().subscribe();
-    servicio.programas('f 1').subscribe();
+    let facultades: unknown;
+    let programas: unknown;
+    servicio.facultades().subscribe((respuesta) => (facultades = respuesta));
+    servicio.programas('f 1').subscribe((respuesta) => (programas = respuesta));
 
-    http.expectOne(`${api}/catalogo/facultades`).flush([]);
-    http.expectOne(`${api}/catalogo/facultades/f%201/programas`).flush([]);
+    const peticionFacultades = http.expectOne(`${api}/catalogo/facultades`);
+    const peticionProgramas = http.expectOne(`${api}/catalogo/facultades/f%201/programas`);
+    expect(peticionFacultades.request.method).toBe('GET');
+    expect(peticionProgramas.request.method).toBe('GET');
+    peticionFacultades.flush([{ id: 'f 1', nombre: 'Ingeniería' }]);
+    peticionProgramas.flush([{ id: 'p1', nombre: 'Sistemas' }]);
+    expect(facultades).toEqual([{ id: 'f 1', nombre: 'Ingeniería' }]);
+    expect(programas).toEqual([{ id: 'p1', nombre: 'Sistemas' }]);
   });
 
   it('envía la solicitud de registro', () => {
