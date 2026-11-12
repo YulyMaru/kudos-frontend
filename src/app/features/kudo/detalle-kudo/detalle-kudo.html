@@ -1,0 +1,74 @@
+<section class="pagina">
+  <a mat-button routerLink="/feed" class="volver">
+    <mat-icon aria-hidden="true">arrow_back</mat-icon>
+    Volver al inicio
+  </a>
+
+  @if (kudo.isLoading()) {
+    <app-esqueleto-tarjeta [cantidad]="1" />
+  } @else if (noExiste()) {
+    <app-estado-vacio icono="search_off" titulo="Este Kudo no está disponible" mensaje="Es posible que no exista o que haya sido retirado." />
+  } @else if (kudo.error()) {
+    <app-estado-error [mensaje]="mensajeError()" (reintentar)="kudo.reload()" />
+  } @else if (kudo.hasValue()) {
+    @let detalle = kudo.value();
+    <article class="detalle">
+      <header>
+        <span class="categoria">{{ detalle.categoria.nombre }}</span>
+        <h1>
+          {{ detalle.autor.nombreCompleto }} reconoció a {{ detalle.destinatario.nombreCompleto }}
+        </h1>
+        <p class="meta">
+          {{ detalle.autor.rol | rolLegible }} → {{ detalle.destinatario.rol | rolLegible }} ·
+          <time [attr.datetime]="detalle.fechaPublicacion">{{ detalle.fechaPublicacion | date: 'd MMM y, h:mm a' }}</time>
+        </p>
+      </header>
+
+      <p class="contenido">{{ detalle.contenido }}</p>
+
+      <ul class="datos" aria-label="Interacciones">
+        <li>
+          <mat-icon aria-hidden="true">star</mat-icon>
+          @if (detalle.cantidadCalificaciones > 0) {
+            {{ detalle.promedioCalificacion | number: '1.1-1' }} ({{ detalle.cantidadCalificaciones }} calificaciones)
+          } @else {
+            Sin calificaciones
+          }
+        </li>
+        <li>
+          <mat-icon aria-hidden="true">forum</mat-icon>
+          {{ detalle.cantidadReplicas }} réplicas
+        </li>
+      </ul>
+
+      @if (detalle.adjuntos.length > 0) {
+        <section class="adjuntos" aria-labelledby="titulo-adjuntos">
+          <h2 id="titulo-adjuntos">Adjuntos</h2>
+          <ul>
+            @for (adjunto of detalle.adjuntos; track adjunto.id) {
+              <li>
+                <mat-icon aria-hidden="true">{{ icono(adjunto) }}</mat-icon>
+                <span class="nombre">
+                  {{ adjunto.nombreOriginal }}
+                  <small>{{ adjunto.tamanoBytes | tamanoArchivo }}</small>
+                </span>
+                <button
+                  mat-stroked-button
+                  type="button"
+                  (click)="abrirAdjunto(adjunto)"
+                  [disabled]="abriendo() === adjunto.id"
+                  [attr.aria-label]="'Ver ' + adjunto.nombreOriginal"
+                >
+                  {{ abriendo() === adjunto.id ? 'Abriendo…' : 'Ver' }}
+                </button>
+              </li>
+            }
+          </ul>
+          @if (errorAdjunto(); as mensaje) {
+            <p class="error" role="alert">{{ mensaje }}</p>
+          }
+        </section>
+      }
+    </article>
+  }
+</section>

@@ -1,0 +1,81 @@
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.opcion-nombre {
+  display: block;
+}
+
+.opcion-rol {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.adjuntos {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 16px;
+
+  h2 {
+    margin: 0;
+    font: var(--mat-sys-title-small);
+
+    small {
+      font: var(--mat-sys-body-small);
+      color: var(--mat-sys-on-surface-variant);
+    }
+  }
+
+  > button {
+    min-height: 48px;
+  }
+}
+
+.archivos {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 4px 4px 12px;
+    border-radius: 8px;
+    background: var(--mat-sys-surface-container-low);
+  }
+}
+
+.nombre {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+
+  small {
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.aviso-error {
+  margin: 0;
+  color: var(--mat-sys-error);
+}
+
+.error {
+  margin: 0 0 12px;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+}
+
+.enviar {
+  min-height: 48px;
+}

@@ -1,0 +1,42 @@
+<section class="pagina">
+  <header class="encabezado">
+    <h1 class="titulo-pagina">Reconocimientos</h1>
+    <button mat-icon-button type="button" (click)="recargar()" aria-label="Actualizar el feed">
+      <mat-icon aria-hidden="true">refresh</mat-icon>
+    </button>
+  </header>
+
+  @if (cargandoInicial()) {
+    <app-esqueleto-tarjeta [cantidad]="3" />
+  } @else if (error() && kudos().length === 0) {
+    <app-estado-error [mensaje]="error()!" (reintentar)="recargar()" />
+  } @else if (kudos().length === 0) {
+    <app-estado-vacio
+      icono="emoji_events"
+      titulo="Aún no hay Kudos"
+      mensaje="Cuando alguien de la comunidad reciba un reconocimiento aparecerá aquí."
+    />
+  } @else {
+    <ol class="lista" aria-label="Kudos recientes">
+      @for (kudo of kudos(); track kudo.id) {
+        <li><app-tarjeta-kudo [kudo]="kudo" /></li>
+      }
+    </ol>
+
+    @if (siguienteCursor() !== null) {
+      <div #centinela class="mas">
+        @if (cargandoMas()) {
+          <mat-progress-spinner mode="indeterminate" diameter="32" aria-label="Cargando más Kudos" />
+        } @else {
+          <button mat-stroked-button type="button" (click)="cargarMas()">Cargar más</button>
+        }
+      </div>
+    } @else {
+      <p class="fin">Ya viste todos los reconocimientos.</p>
+    }
+
+    @if (error()) {
+      <p class="error-parcial" role="alert">{{ error() }}</p>
+    }
+  }
+</section>

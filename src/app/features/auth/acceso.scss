@@ -1,0 +1,111 @@
+:host {
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px 16px;
+  background: var(--mat-sys-surface-container-low);
+}
+
+.acceso {
+  width: 100%;
+  max-width: 400px;
+}
+
+.encabezado {
+  margin-bottom: 24px;
+  text-align: center;
+
+  h1 {
+    margin: 8px 0 4px;
+    font: var(--mat-sys-headline-medium);
+    color: var(--mat-sys-primary);
+  }
+
+  p {
+    margin: 0;
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.logo {
+  width: 56px;
+  height: 56px;
+  font-size: 56px;
+  color: var(--mat-sys-primary);
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.error {
+  margin: 0 0 12px;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+}
+
+.enviar {
+  min-height: 48px;
+}
+
+.ancho {
+  max-width: 480px;
+}
+
+.enlaces {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 16px;
+
+  a {
+    min-height: 48px;
+  }
+}
+
+.exito {
+  margin: 0 0 12px;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+}
+
+.politica {
+  min-height: 48px;
+  margin-bottom: 8px;
+}
+
+.canal {
+  margin-bottom: 16px;
+  padding: 16px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 12px;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 12px;
+    font: var(--mat-sys-title-medium);
+  }
+
+  .acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    button {
+      min-height: 48px;
+    }
+  }
+}
+
+.verificado {
+  color: var(--mat-sys-primary);
+}

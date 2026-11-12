@@ -1,0 +1,135 @@
+:host {
+  display: block;
+  min-height: 100%;
+}
+
+.saltar {
+  position: absolute;
+  left: 8px;
+  top: -48px;
+  z-index: 10;
+  padding: 12px 16px;
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+  border-radius: 8px;
+
+  &:focus {
+    top: 8px;
+  }
+}
+
+.contenedor {
+  height: 100vh;
+}
+
+.lateral {
+  width: 240px;
+  border-right: 1px solid var(--mat-sys-outline-variant);
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 8px 16px 16px;
+  font: var(--mat-sys-title-large);
+  color: var(--mat-sys-primary);
+}
+
+.superior {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+}
+
+.marca-movil {
+  font: var(--mat-sys-title-large);
+}
+
+.principal-movil {
+  padding-bottom: calc(72px + env(safe-area-inset-bottom));
+}
+
+main:focus {
+  outline: none;
+}
+
+.inferior {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: space-around;
+  height: calc(64px + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
+  background: var(--mat-sys-surface-container);
+  border-top: 1px solid var(--mat-sys-outline-variant);
+}
+
+.item-inferior {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  min-height: 48px;
+  gap: 2px;
+  color: var(--mat-sys-on-surface-variant);
+  text-decoration: none;
+  font: var(--mat-sys-label-medium);
+
+  &.activo {
+    color: var(--mat-sys-primary);
+    font-weight: 700;
+  }
+}
+
+.contenido-lateral {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.usuario {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: auto;
+  padding: 16px;
+  border-top: 1px solid var(--mat-sys-outline-variant);
+}
+
+.nombre {
+  font: var(--mat-sys-title-small);
+}
+
+.rol {
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.salir {
+  min-height: 48px;
+  margin-top: 8px;
+}
+
+.espacio {
+  flex: 1;
+}
+
+.dar-kudo {
+  min-height: 48px;
+  margin: 0 16px 8px;
+}
+
+.fab-kudo {
+  position: fixed;
+  right: 16px;
+  bottom: calc(80px + env(safe-area-inset-bottom));
+  z-index: 3;
+}

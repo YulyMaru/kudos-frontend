@@ -1,0 +1,59 @@
+<section class="acceso">
+  <header class="encabezado">
+    <mat-icon class="logo" aria-hidden="true">workspace_premium</mat-icon>
+    <h1>UCO Kudos</h1>
+    <p>Reconoce a quienes hacen grande a la comunidad UCO.</p>
+  </header>
+
+  <form [formGroup]="formulario" (ngSubmit)="enviar()" novalidate>
+    <mat-form-field appearance="outline">
+      <mat-label>Correo institucional</mat-label>
+      <input matInput type="email" formControlName="correo" autocomplete="username" inputmode="email" />
+      @if (formulario.controls.correo.hasError('required')) {
+        <mat-error>Escribe tu correo institucional</mat-error>
+      } @else if (formulario.controls.correo.hasError('email')) {
+        <mat-error>El correo no tiene un formato válido</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Contraseña</mat-label>
+      <input
+        matInput
+        [type]="mostrarContrasena() ? 'text' : 'password'"
+        formControlName="contrasena"
+        autocomplete="current-password"
+      />
+      <button
+        mat-icon-button
+        matSuffix
+        type="button"
+        (click)="alternarContrasena()"
+        [attr.aria-label]="mostrarContrasena() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+        [attr.aria-pressed]="mostrarContrasena()"
+      >
+        <mat-icon aria-hidden="true">{{ mostrarContrasena() ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+      @if (formulario.controls.contrasena.hasError('required')) {
+        <mat-error>Escribe tu contraseña</mat-error>
+      }
+    </mat-form-field>
+
+    @if (error(); as mensaje) {
+      <p class="error" role="alert">{{ mensaje }}</p>
+    }
+
+    <button mat-flat-button type="submit" class="enviar" [disabled]="enviando()">
+      @if (enviando()) {
+        <mat-progress-spinner mode="indeterminate" diameter="20" aria-label="Iniciando sesión" />
+      } @else {
+        Iniciar sesión
+      }
+    </button>
+  </form>
+
+  <nav class="enlaces" aria-label="Otras opciones">
+    <a mat-button routerLink="/restablecer">¿Olvidaste tu contraseña?</a>
+    <a mat-button routerLink="/registro">Solicitar registro</a>
+  </nav>
+</section>

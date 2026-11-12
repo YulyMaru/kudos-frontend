@@ -1,0 +1,68 @@
+<a class="saltar" href="#contenido">Saltar al contenido</a>
+@if (!sesion.autenticado()) {
+  <main id="contenido" tabindex="-1">
+    <router-outlet />
+  </main>
+} @else if (esEscritorio()) {
+  <mat-sidenav-container class="contenedor">
+    <mat-sidenav mode="side" opened class="lateral">
+      <div class="contenido-lateral">
+      <div class="marca">
+        <span>UCO Kudos</span>
+        <app-estado-notificaciones />
+      </div>
+      <a mat-flat-button routerLink="/kudos/nuevo" class="dar-kudo">
+        <mat-icon aria-hidden="true">volunteer_activism</mat-icon>
+        Dar Kudo
+      </a>
+      <mat-nav-list aria-label="Navegación principal">
+        @for (enlace of enlaces; track enlace.ruta) {
+          <a mat-list-item [routerLink]="enlace.ruta" routerLinkActive #activo="routerLinkActive" [activated]="activo.isActive">
+            <mat-icon matListItemIcon aria-hidden="true">{{ enlace.icono }}</mat-icon>
+            <span matListItemTitle>{{ enlace.etiqueta }}</span>
+          </a>
+        }
+      </mat-nav-list>
+      @if (sesion.usuario(); as usuario) {
+        <div class="usuario">
+          <span class="nombre">{{ usuario.nombreCompleto }}</span>
+          <span class="rol">{{ usuario.rol | rolLegible }}</span>
+          <button mat-stroked-button type="button" class="salir" (click)="cerrarSesion()">
+            <mat-icon aria-hidden="true">logout</mat-icon>
+            Cerrar sesión
+          </button>
+        </div>
+      }
+      </div>
+    </mat-sidenav>
+    <mat-sidenav-content>
+      <main id="contenido" tabindex="-1">
+        <router-outlet />
+      </main>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+} @else {
+  <mat-toolbar class="superior">
+    <span class="marca-movil">UCO Kudos</span>
+    <span class="espacio"></span>
+    <app-estado-notificaciones />
+    <button mat-icon-button type="button" (click)="cerrarSesion()" aria-label="Cerrar sesión">
+      <mat-icon aria-hidden="true">logout</mat-icon>
+    </button>
+  </mat-toolbar>
+  <main id="contenido" class="principal-movil" tabindex="-1">
+    <router-outlet />
+  </main>
+  <a mat-fab extended routerLink="/kudos/nuevo" class="fab-kudo">
+    <mat-icon aria-hidden="true">volunteer_activism</mat-icon>
+    Dar Kudo
+  </a>
+  <nav class="inferior" aria-label="Navegación principal">
+    @for (enlace of enlaces; track enlace.ruta) {
+      <a class="item-inferior" [routerLink]="enlace.ruta" routerLinkActive="activo" ariaCurrentWhenActive="page">
+        <mat-icon aria-hidden="true">{{ enlace.icono }}</mat-icon>
+        <span>{{ enlace.etiqueta }}</span>
+      </a>
+    }
+  </nav>
+}

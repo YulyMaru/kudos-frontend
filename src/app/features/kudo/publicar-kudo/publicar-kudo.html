@@ -1,0 +1,90 @@
+<section class="pagina">
+  <h1 class="titulo-pagina">Dar un Kudo</h1>
+
+  <form [formGroup]="formulario" (ngSubmit)="publicar()" novalidate>
+    <mat-form-field appearance="outline">
+      <mat-label>¿A quién quieres reconocer?</mat-label>
+      <input
+        matInput
+        #campoDestinatario
+        type="search"
+        formControlName="destinatario"
+        (input)="buscarPersonas(campoDestinatario.value)"
+        [matAutocomplete]="personas"
+        autocomplete="off"
+        placeholder="Escribe al menos 2 letras del nombre o correo"
+      />
+      <mat-icon matSuffix aria-hidden="true">person_search</mat-icon>
+      <mat-autocomplete #personas="matAutocomplete" [displayWith]="mostrarPersona" [requireSelection]="true">
+        @for (persona of sugerencias(); track persona.id) {
+          <mat-option [value]="persona">
+            <span class="opcion-nombre">{{ persona.nombreCompleto }}</span>
+            <small class="opcion-rol">{{ persona.rol | rolLegible }}</small>
+          </mat-option>
+        }
+      </mat-autocomplete>
+      @if (formulario.controls.destinatario.hasError('personaSeleccionada')) {
+        <mat-error>Elige a la persona de la lista de sugerencias</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Categoría</mat-label>
+      <mat-select formControlName="categoriaId">
+        @for (categoria of categorias.value() ?? []; track categoria.id) {
+          <mat-option [value]="categoria.id">{{ categoria.nombre }}</mat-option>
+        }
+      </mat-select>
+      @if (categorias.error()) {
+        <mat-hint class="aviso-error">No pudimos cargar las categorías. Recarga la página.</mat-hint>
+      }
+      @if (formulario.controls.categoriaId.hasError('required')) {
+        <mat-error>Elige una categoría</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Cuéntale a la comunidad por qué lo reconoces</mat-label>
+      <textarea matInput formControlName="contenido" cdkTextareaAutosize cdkAutosizeMinRows="4"></textarea>
+      @if (formulario.controls.contenido.invalid) {
+        <mat-error>Escribe el motivo del reconocimiento</mat-error>
+      }
+    </mat-form-field>
+
+    <section class="adjuntos" aria-labelledby="titulo-adjuntos">
+      <h2 id="titulo-adjuntos">Adjuntos <small>(opcional, hasta {{ maximoAdjuntos }} archivos JPG, PNG o PDF de 5 MB)</small></h2>
+      <input #selector class="visualmente-oculto" type="file" multiple [accept]="aceptarArchivos" (change)="alSeleccionarArchivos($event)" aria-label="Seleccionar adjuntos" tabindex="-1" />
+      <button mat-stroked-button type="button" (click)="selector.click()" [disabled]="adjuntos().length >= maximoAdjuntos">
+        <mat-icon aria-hidden="true">attach_file</mat-icon>
+        Adjuntar archivos
+      </button>
+      @if (adjuntos().length > 0) {
+        <ul class="archivos">
+          @for (archivo of adjuntos(); track $index) {
+            <li>
+              <span class="nombre">{{ archivo.name }} <small>{{ archivo.size | tamanoArchivo }}</small></span>
+              <button mat-icon-button type="button" (click)="quitarArchivo($index)" [attr.aria-label]="'Quitar ' + archivo.name">
+                <mat-icon aria-hidden="true">close</mat-icon>
+              </button>
+            </li>
+          }
+        </ul>
+      }
+      @for (mensaje of erroresAdjuntos(); track mensaje) {
+        <p class="aviso-error" role="alert">{{ mensaje }}</p>
+      }
+    </section>
+
+    @if (error(); as mensaje) {
+      <p class="error" role="alert">{{ mensaje }}</p>
+    }
+
+    <button mat-flat-button type="submit" class="enviar" [disabled]="enviando()">
+      @if (enviando()) {
+        <mat-progress-spinner mode="indeterminate" diameter="20" aria-label="Publicando" />
+      } @else {
+        Publicar Kudo
+      }
+    </button>
+  </form>
+</section>

@@ -1,0 +1,69 @@
+@use '@angular/material' as mat;
+
+html {
+  color-scheme: light;
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$green-palette,
+        tertiary: mat.$cyan-palette,
+        theme-type: light,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--mat-sys-surface-container-lowest);
+  color: var(--mat-sys-on-surface);
+  -webkit-font-smoothing: antialiased;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+a {
+  color: var(--mat-sys-primary);
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0;
+}
+
+.visualmente-oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+:focus-visible {
+  outline: 3px solid var(--mat-sys-primary);
+  outline-offset: 2px;
+}
+
+.pagina {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.titulo-pagina {
+  margin: 0 0 16px;
+  font: var(--mat-sys-headline-small);
+}

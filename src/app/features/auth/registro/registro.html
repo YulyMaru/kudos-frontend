@@ -1,0 +1,135 @@
+<section class="acceso ancho">
+  <header class="encabezado">
+    <mat-icon class="logo" aria-hidden="true">how_to_reg</mat-icon>
+    <h1>Solicitar registro</h1>
+    <p>Tu solicitud será revisada por quien aprueba tu rol en la UCO.</p>
+  </header>
+
+  <form [formGroup]="formulario" (ngSubmit)="registrar()" novalidate>
+    <mat-form-field appearance="outline">
+      <mat-label>Nombre completo</mat-label>
+      <input matInput formControlName="nombreCompleto" autocomplete="name" />
+      @if (formulario.controls.nombreCompleto.invalid) {
+        <mat-error>Escribe tu nombre completo</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Correo institucional</mat-label>
+      <input matInput type="email" formControlName="correo" autocomplete="email" inputmode="email" />
+      <mat-hint>Debe terminar en &#64;{{ dominio }}</mat-hint>
+      @if (formulario.controls.correo.hasError('required')) {
+        <mat-error>Escribe tu correo institucional</mat-error>
+      } @else if (formulario.controls.correo.hasError('email')) {
+        <mat-error>El correo no tiene un formato válido</mat-error>
+      } @else if (formulario.controls.correo.hasError('correoInstitucional')) {
+        <mat-error>Se requiere un correo institucional (&#64;{{ dominio }})</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Celular con WhatsApp</mat-label>
+      <input matInput type="tel" formControlName="celular" autocomplete="tel" inputmode="tel" placeholder="+573001234567" />
+      <mat-hint>Formato internacional, por ejemplo +573001234567</mat-hint>
+      @if (formulario.controls.celular.hasError('required')) {
+        <mat-error>Escribe tu número celular</mat-error>
+      } @else if (formulario.controls.celular.hasError('celular')) {
+        <mat-error>Usa el formato internacional, por ejemplo +573001234567</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Rol que solicitas</mat-label>
+      <mat-select formControlName="rol">
+        @for (opcion of roles; track opcion) {
+          <mat-option [value]="opcion">{{ opcion | rolLegible }}</mat-option>
+        }
+      </mat-select>
+      @if (formulario.controls.rol.invalid) {
+        <mat-error>Elige el rol que solicitas</mat-error>
+      }
+    </mat-form-field>
+
+    @if (requierePrograma(rol()) || requiereFacultad(rol())) {
+      <mat-form-field appearance="outline">
+        <mat-label>Facultad</mat-label>
+        <mat-select formControlName="facultadId">
+          @for (facultad of facultades.value() ?? []; track facultad.id) {
+            <mat-option [value]="facultad.id">{{ facultad.nombre }}</mat-option>
+          }
+        </mat-select>
+        @if (facultades.error()) {
+          <mat-hint>No pudimos cargar las facultades. Recarga la página.</mat-hint>
+        }
+        @if (formulario.controls.facultadId.invalid) {
+          <mat-error>Elige tu facultad</mat-error>
+        }
+      </mat-form-field>
+    }
+
+    @if (requierePrograma(rol()) && facultadSeleccionada() !== '') {
+      <mat-form-field appearance="outline">
+        <mat-label>Programa</mat-label>
+        <mat-select formControlName="programaId">
+          @for (programa of programas.value() ?? []; track programa.id) {
+            <mat-option [value]="programa.id">{{ programa.nombre }}</mat-option>
+          }
+        </mat-select>
+        @if (programas.error()) {
+          <mat-hint>No pudimos cargar los programas. Elige de nuevo la facultad.</mat-hint>
+        }
+        @if (formulario.controls.programaId.invalid) {
+          <mat-error>Elige tu programa</mat-error>
+        }
+      </mat-form-field>
+    }
+
+    <mat-form-field appearance="outline">
+      <mat-label>Contraseña</mat-label>
+      <input matInput type="password" formControlName="contrasena" autocomplete="new-password" />
+      <mat-hint>Mínimo {{ longitudMinima }} caracteres</mat-hint>
+      @if (formulario.controls.contrasena.hasError('required')) {
+        <mat-error>Escribe una contraseña</mat-error>
+      } @else if (formulario.controls.contrasena.hasError('contrasenaCorta')) {
+        <mat-error>La contraseña debe tener al menos {{ longitudMinima }} caracteres</mat-error>
+      } @else if (formulario.controls.contrasena.hasError('contrasenaLarga')) {
+        <mat-error>La contraseña es demasiado larga</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Confirmar contraseña</mat-label>
+      <input matInput type="password" formControlName="confirmacion" autocomplete="new-password" />
+      @if (formulario.controls.confirmacion.hasError('required')) {
+        <mat-error>Confirma la contraseña</mat-error>
+      }
+    </mat-form-field>
+    @if (formulario.hasError('contrasenasDistintas') && formulario.controls.confirmacion.touched) {
+      <p class="error" role="alert">Las contraseñas no coinciden</p>
+    }
+
+    <mat-checkbox formControlName="aceptaPolitica" class="politica">
+      Acepto la política de tratamiento de datos personales de la UCO
+    </mat-checkbox>
+    @if (formulario.controls.aceptaPolitica.invalid && formulario.controls.aceptaPolitica.touched) {
+      <p class="error" role="alert">Debes aceptar la política de tratamiento de datos para continuar</p>
+    }
+
+    @if (error(); as mensaje) {
+      <p class="error" role="alert">{{ mensaje }}</p>
+    }
+
+    <button mat-flat-button type="submit" class="enviar" [disabled]="enviando()">
+      @if (enviando()) {
+        <mat-progress-spinner mode="indeterminate" diameter="20" aria-label="Enviando solicitud" />
+      } @else {
+        Enviar solicitud
+      }
+    </button>
+  </form>
+
+  <nav class="enlaces" aria-label="Otras opciones">
+    <a mat-button routerLink="/iniciar-sesion">Ya tengo cuenta</a>
+    <a mat-button routerLink="/verificar">Tengo un código</a>
+  </nav>
+</section>

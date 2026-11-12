@@ -1,0 +1,117 @@
+name: CI/CD frontend
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  TRIVY_IMAGEN: aquasec/trivy:0.58.1
+
+jobs:
+  construir-y-analizar:
+    name: Lint, pruebas, build y calidad
+    runs-on: ubuntu-24.04
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Instalar Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Lint
+        run: npx ng lint
+
+      - name: Pruebas unitarias con cobertura
+        run: npm run test:ci
+
+      - name: Instalar navegador de Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Pruebas extremo a extremo
+        run: npm run e2e
+
+      - name: Build de producción
+        run: npx ng build --configuration production
+
+      - name: Publicar reportes de pruebas y cobertura
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reportes-pruebas
+          path: |
+            coverage
+            playwright-report
+          retention-days: 7
+
+      - name: Guardar build
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: dist/kudos-frontend/browser
+          retention-days: 1
+
+      - name: Análisis y compuerta de calidad en SonarQube Cloud
+        if: env.SONAR_TOKEN != ''
+        uses: SonarSource/sonarqube-scan-action@v5
+        with:
+          args: >
+            -Dsonar.organization=${{ vars.SONAR_ORGANIZACION }}
+            -Dsonar.projectKey=${{ vars.SONAR_PROYECTO }}
+            -Dsonar.qualitygate.wait=true
+
+  seguridad:
+    name: Escanear repositorio con Trivy
+    needs: construir-y-analizar
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+
+      - name: Escanear secretos, configuración y dependencias
+        run: >
+          docker run --rm -v "$PWD:/repositorio" "$TRIVY_IMAGEN"
+          fs --exit-code 1 --scanners vuln,secret,misconfig --severity CRITICAL --no-progress /repositorio
+
+  desplegar:
+    name: Desplegar en Firebase Hosting
+    needs: seguridad
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    environment: produccion
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+
+      - name: Descargar build
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: dist/kudos-frontend/browser
+
+      - name: Publicar en Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: ${{ vars.FIREBASE_PROYECTO }}
+          channelId: live

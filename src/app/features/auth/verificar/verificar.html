@@ -1,0 +1,68 @@
+<section class="acceso ancho">
+  <header class="encabezado">
+    <mat-icon class="logo" aria-hidden="true">verified_user</mat-icon>
+    <h1>Verificar mis datos</h1>
+    <p>Confirma tu correo y tu celular con los códigos que te enviamos.</p>
+  </header>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Correo institucional</mat-label>
+    <input matInput type="email" [formControl]="campoCorreo" autocomplete="email" inputmode="email" />
+    @if (campoCorreo.invalid) {
+      <mat-error>Escribe el correo con el que solicitaste el registro</mat-error>
+    }
+  </mat-form-field>
+
+  @for (item of canales; track item.canal) {
+    @let estado = estados()[item.canal];
+    <section class="canal" [attr.aria-labelledby]="'titulo-' + item.canal">
+      <h2 [id]="'titulo-' + item.canal">
+        <mat-icon aria-hidden="true">{{ item.icono }}</mat-icon>
+        {{ item.titulo }}
+        @if (estado.verificado) {
+          <mat-icon class="verificado" aria-hidden="true">check_circle</mat-icon>
+          <span class="visualmente-oculto">verificado</span>
+        }
+      </h2>
+
+      @if (!estado.verificado) {
+        <mat-form-field appearance="outline">
+          <mat-label>Código</mat-label>
+          <input
+            matInput
+            [formControl]="codigos[item.canal]"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            maxlength="6"
+          />
+          <mat-hint>{{ item.ayuda }}</mat-hint>
+          @if (codigos[item.canal].invalid) {
+            <mat-error>El código tiene 6 dígitos</mat-error>
+          }
+        </mat-form-field>
+        <div class="acciones">
+          <button mat-flat-button type="button" (click)="verificar(item.canal)" [disabled]="estado.ocupado">Verificar</button>
+          <button mat-button type="button" (click)="reenviar(item.canal)" [disabled]="estado.ocupado">Reenviar código</button>
+        </div>
+      }
+
+      @if (estado.mensaje; as mensaje) {
+        <p class="exito" role="status">{{ mensaje }}</p>
+      }
+      @if (estado.error; as mensaje) {
+        <p class="error" role="alert">{{ mensaje }}</p>
+      }
+    </section>
+  }
+
+  @if (completo()) {
+    <p class="exito" role="status">
+      Tus datos quedaron verificados. Te avisaremos cuando tu solicitud sea aprobada para que puedas iniciar sesión.
+    </p>
+  }
+
+  <nav class="enlaces" aria-label="Otras opciones">
+    <a mat-button routerLink="/iniciar-sesion">Ir a iniciar sesión</a>
+    <a mat-button routerLink="/registro">Solicitar registro</a>
+  </nav>
+</section>

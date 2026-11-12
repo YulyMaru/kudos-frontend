@@ -1,0 +1,80 @@
+<section class="acceso">
+  <header class="encabezado">
+    <mat-icon class="logo" aria-hidden="true">lock_reset</mat-icon>
+    <h1>Restablecer contraseña</h1>
+    @if (token()) {
+      <p>Escribe tu nueva contraseña.</p>
+    } @else {
+      <p>Te enviaremos un enlace de un solo uso a tu correo institucional.</p>
+    }
+  </header>
+
+  @if (mensaje(); as texto) {
+    <p class="exito" role="status">{{ texto }}</p>
+  }
+
+  @if (!terminado()) {
+    @if (token()) {
+      <form [formGroup]="confirmacion" (ngSubmit)="confirmar()" novalidate>
+        <mat-form-field appearance="outline">
+          <mat-label>Nueva contraseña</mat-label>
+          <input matInput type="password" formControlName="contrasena" autocomplete="new-password" />
+          <mat-hint>Mínimo {{ longitudMinima }} caracteres</mat-hint>
+          @if (confirmacion.controls.contrasena.hasError('required')) {
+            <mat-error>Escribe la nueva contraseña</mat-error>
+          } @else if (confirmacion.controls.contrasena.hasError('contrasenaCorta')) {
+            <mat-error>La contraseña debe tener al menos {{ longitudMinima }} caracteres</mat-error>
+          } @else if (confirmacion.controls.contrasena.hasError('contrasenaLarga')) {
+            <mat-error>La contraseña es demasiado larga</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Confirmar contraseña</mat-label>
+          <input matInput type="password" formControlName="confirmacion" autocomplete="new-password" />
+          @if (confirmacion.controls.confirmacion.hasError('required')) {
+            <mat-error>Confirma la contraseña</mat-error>
+          }
+        </mat-form-field>
+        @if (confirmacion.hasError('contrasenasDistintas') && confirmacion.controls.confirmacion.touched) {
+          <p class="error" role="alert">Las contraseñas no coinciden</p>
+        }
+        @if (error(); as texto) {
+          <p class="error" role="alert">{{ texto }}</p>
+        }
+        <button mat-flat-button type="submit" class="enviar" [disabled]="enviando()">
+          @if (enviando()) {
+            <mat-progress-spinner mode="indeterminate" diameter="20" aria-label="Guardando" />
+          } @else {
+            Guardar contraseña
+          }
+        </button>
+      </form>
+    } @else {
+      <form [formGroup]="solicitud" (ngSubmit)="solicitar()" novalidate>
+        <mat-form-field appearance="outline">
+          <mat-label>Correo institucional</mat-label>
+          <input matInput type="email" formControlName="correo" autocomplete="username" inputmode="email" />
+          @if (solicitud.controls.correo.hasError('required')) {
+            <mat-error>Escribe tu correo institucional</mat-error>
+          } @else if (solicitud.controls.correo.hasError('email')) {
+            <mat-error>El correo no tiene un formato válido</mat-error>
+          }
+        </mat-form-field>
+        @if (error(); as texto) {
+          <p class="error" role="alert">{{ texto }}</p>
+        }
+        <button mat-flat-button type="submit" class="enviar" [disabled]="enviando()">
+          @if (enviando()) {
+            <mat-progress-spinner mode="indeterminate" diameter="20" aria-label="Enviando" />
+          } @else {
+            Enviar enlace
+          }
+        </button>
+      </form>
+    }
+  }
+
+  <nav class="enlaces" aria-label="Otras opciones">
+    <a mat-button routerLink="/iniciar-sesion">Volver a iniciar sesión</a>
+  </nav>
+</section>
