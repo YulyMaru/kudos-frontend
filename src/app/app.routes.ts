@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
-import { autenticadoGuard, invitadoGuard } from './core/guards/sesion.guards';
+import { autenticadoGuard, invitadoGuard, rolGuard } from './core/guards/sesion.guards';
+import { ROLES_ADMINISTRACION } from './shared/models/sesion';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'feed' },
@@ -43,6 +44,13 @@ export const routes: Routes = [
     title: 'Kudo | UCO Kudos',
     canActivate: [autenticadoGuard],
     loadComponent: () => import('./features/kudo/detalle-kudo/detalle-kudo').then((m) => m.DetalleKudo),
+  },
+  {
+    path: 'administracion/solicitudes',
+    title: 'Solicitudes | UCO Kudos',
+    canActivate: [autenticadoGuard, rolGuard(ROLES_ADMINISTRACION)],
+    loadComponent: () =>
+      import('./features/administracion/solicitudes/solicitudes').then((m) => m.Solicitudes),
   },
   {
     path: '**',

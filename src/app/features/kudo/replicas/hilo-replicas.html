@@ -1,0 +1,83 @@
+@if (padreId() === null) {
+  <app-formulario-replica [kudoId]="kudoId()" (publicada)="alPublicarRaiz()" />
+}
+
+@if (replicas().length > 0) {
+  <ul class="lista">
+    @for (replica of replicas(); track replica.id) {
+      <li class="replica">
+        <header>
+          <strong>{{ replica.autor.nombreCompleto }}</strong>
+          <span class="meta">
+            {{ replica.autor.rol | rolLegible }} ·
+            <time [attr.datetime]="replica.fechaPublicacion">{{ replica.fechaPublicacion | fechaRelativa }}</time>
+          </span>
+        </header>
+        <p class="contenido">{{ replica.contenido }}</p>
+        <app-calificacion
+          tipo="REPLICA"
+          [contenidoId]="replica.id"
+          [promedio]="replica.promedioCalificacion"
+          [cantidad]="replica.cantidadCalificaciones"
+        />
+        <div class="acciones">
+          <button
+            mat-button
+            type="button"
+            (click)="alternarRespuesta(replica)"
+            [attr.aria-expanded]="respondiendo() === replica.id"
+          >
+            <mat-icon aria-hidden="true">reply</mat-icon>
+            Responder
+          </button>
+          @if (replica.cantidadRespuestas > 0) {
+            <button
+              mat-button
+              type="button"
+              (click)="alternarRespuestas(replica)"
+              [attr.aria-expanded]="abiertas().has(replica.id)"
+            >
+              <mat-icon aria-hidden="true">{{ abiertas().has(replica.id) ? 'expand_less' : 'expand_more' }}</mat-icon>
+              {{ abiertas().has(replica.id) ? 'Ocultar respuestas' : 'Ver respuestas (' + replica.cantidadRespuestas + ')' }}
+            </button>
+          }
+          <app-boton-reportar tipo="REPLICA" [contenidoId]="replica.id" />
+        </div>
+        @if (respondiendo() === replica.id) {
+          <app-formulario-replica
+            [kudoId]="kudoId()"
+            [padreId]="replica.id"
+            [etiqueta]="'Responder a ' + replica.autor.nombreCompleto"
+            (publicada)="alResponder(replica)"
+          />
+        }
+        @if (abiertas().has(replica.id)) {
+          <app-hilo-replicas
+            class="anidado"
+            [kudoId]="kudoId()"
+            [padreId]="replica.id"
+            [version]="versiones()[replica.id] ?? 0"
+            (publicada)="publicada.emit()"
+          />
+        }
+      </li>
+    }
+  </ul>
+} @else if (!cargando() && !error() && padreId() === null) {
+  <p class="vacio">Aún no hay réplicas. ¡Sé el primero en responder!</p>
+}
+
+@if (cargando()) {
+  <p class="estado" role="status">Cargando réplicas…</p>
+}
+
+@if (error(); as mensaje) {
+  <div class="estado" role="alert">
+    <span class="error">{{ mensaje }}</span>
+    <button mat-button type="button" (click)="reintentar()">Reintentar</button>
+  </div>
+}
+
+@if (siguienteCursor() !== null && !cargando()) {
+  <button mat-stroked-button type="button" class="mas" (click)="cargarMas()">Cargar más réplicas</button>
+}

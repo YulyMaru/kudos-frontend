@@ -1,5 +1,5 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -10,6 +10,7 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { map } from 'rxjs';
 import { SesionService } from './core/auth/sesion.service';
 import { EstadoNotificaciones } from './notificaciones/estado-notificaciones/estado-notificaciones';
+import { ROLES_ADMINISTRACION } from './shared/models/sesion';
 import { RolLegiblePipe } from './shared/pipes/rol-legible.pipe';
 
 export interface EnlaceNavegacion {
@@ -47,7 +48,13 @@ export class App {
     { initialValue: false },
   );
 
-  protected readonly enlaces: readonly EnlaceNavegacion[] = [{ ruta: '/feed', etiqueta: 'Inicio', icono: 'home' }];
+  protected readonly enlaces = computed<readonly EnlaceNavegacion[]>(() => {
+    const rol = this.sesion.usuario()?.rol;
+    const inicio: EnlaceNavegacion = { ruta: '/feed', etiqueta: 'Inicio', icono: 'home' };
+    return rol !== undefined && ROLES_ADMINISTRACION.includes(rol)
+      ? [inicio, { ruta: '/administracion/solicitudes', etiqueta: 'Solicitudes', icono: 'how_to_reg' }]
+      : [inicio];
+  });
 
   protected cerrarSesion(): void {
     this.sesion.cerrarSesion();

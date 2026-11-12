@@ -26,20 +26,15 @@
 
       <p class="contenido">{{ detalle.contenido }}</p>
 
-      <ul class="datos" aria-label="Interacciones">
-        <li>
-          <mat-icon aria-hidden="true">star</mat-icon>
-          @if (detalle.cantidadCalificaciones > 0) {
-            {{ detalle.promedioCalificacion | number: '1.1-1' }} ({{ detalle.cantidadCalificaciones }} calificaciones)
-          } @else {
-            Sin calificaciones
-          }
-        </li>
-        <li>
-          <mat-icon aria-hidden="true">forum</mat-icon>
-          {{ detalle.cantidadReplicas }} réplicas
-        </li>
-      </ul>
+      <div class="interacciones">
+        <app-calificacion
+          tipo="KUDO"
+          [contenidoId]="detalle.id"
+          [promedio]="detalle.promedioCalificacion"
+          [cantidad]="detalle.cantidadCalificaciones"
+        />
+        <app-boton-reportar tipo="KUDO" [contenidoId]="detalle.id" />
+      </div>
 
       @if (detalle.adjuntos.length > 0) {
         <section class="adjuntos" aria-labelledby="titulo-adjuntos">
@@ -69,6 +64,11 @@
           }
         </section>
       }
+
+      <section class="replicas" aria-labelledby="titulo-replicas">
+        <h2 id="titulo-replicas">Réplicas ({{ detalle.cantidadReplicas + replicasNuevas() }})</h2>
+        <app-hilo-replicas [kudoId]="detalle.id" (publicada)="replicasNuevas.set(replicasNuevas() + 1)" />
+      </section>
     </article>
   }
 </section>

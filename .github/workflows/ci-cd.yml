@@ -72,7 +72,7 @@ jobs:
 
       - name: Análisis y compuerta de calidad en SonarQube Cloud
         if: env.SONAR_TOKEN != ''
-        uses: SonarSource/sonarqube-scan-action@v5
+        uses: SonarSource/sonarqube-scan-action@v6
         with:
           args: >
             -Dsonar.organization=${{ vars.SONAR_ORGANIZACION }}

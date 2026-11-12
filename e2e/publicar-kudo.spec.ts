@@ -26,6 +26,7 @@ test('iniciar sesión, publicar un Kudo y verlo en el feed', async ({ page }) =>
   await expect(page).toHaveURL(/\/kudos\/k-1$/);
   await expect(page.getByRole('heading', { name: 'Ana Docente reconoció a Luis Estudiante' })).toBeVisible();
   await expect(page.getByText(motivo)).toBeVisible();
+  await expect(page.getByText('Aún no hay réplicas')).toBeVisible();
 
   await page.getByRole('link', { name: 'Volver al inicio' }).click();
   await expect(page).toHaveURL(/\/feed/);

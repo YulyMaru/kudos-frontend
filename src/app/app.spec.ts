@@ -16,6 +16,7 @@ describe('App', () => {
 
   beforeEach(async () => {
     autenticado.set(true);
+    usuario.set({ id: '1', nombreCompleto: 'Ana Docente', rol: 'DOCENTE' });
     cerrarSesion.mockReset();
     await TestBed.configureTestingModule({
       imports: [App],
@@ -58,6 +59,20 @@ describe('App', () => {
     expect(elemento.querySelector('a.dar-kudo')?.getAttribute('href')).toBe('/kudos/nuevo');
     expect(elemento.querySelector('a.fab-kudo')).toBeNull();
     expect(elemento.querySelector('.usuario')?.textContent).toContain('Docente');
+  });
+
+  it('muestra el enlace a Solicitudes solo a los roles de administración', async () => {
+    estado.next({ matches: false, breakpoints: {} });
+    let elemento = await crear();
+    expect(elemento.querySelector('nav.inferior a[href="/administracion/solicitudes"]')).toBeNull();
+
+    usuario.set({ id: '2', nombreCompleto: 'Rita Rectora', rol: 'RECTOR' });
+    elemento = await crear();
+    expect(elemento.querySelector('nav.inferior a[href="/administracion/solicitudes"]')?.textContent).toContain('Solicitudes');
+
+    estado.next({ matches: true, breakpoints: {} });
+    elemento = await crear();
+    expect(elemento.querySelector('mat-sidenav a[href="/administracion/solicitudes"]')).not.toBeNull();
   });
 
   it('oculta la navegación cuando no hay sesión', async () => {

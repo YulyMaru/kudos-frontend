@@ -1,0 +1,55 @@
+<section class="pagina">
+  <header class="encabezado">
+    <h1 class="titulo-pagina">Solicitudes</h1>
+    <button mat-icon-button type="button" (click)="cargar()" aria-label="Actualizar solicitudes">
+      <mat-icon aria-hidden="true">refresh</mat-icon>
+    </button>
+  </header>
+
+  @if (cargando()) {
+    <app-esqueleto-tarjeta [cantidad]="3" />
+  } @else if (error(); as mensaje) {
+    <app-estado-error [mensaje]="mensaje" (reintentar)="cargar()" />
+  } @else if (solicitudes().length === 0) {
+    <app-estado-vacio icono="how_to_reg" titulo="No hay solicitudes pendientes" />
+  } @else {
+    <ul class="lista" aria-label="Solicitudes pendientes">
+      @for (solicitud of solicitudes(); track solicitud.id) {
+        <li class="tarjeta">
+          <div class="cabecera">
+            <h2 class="nombre">{{ solicitud.nombreCompleto }}</h2>
+            <span class="fecha">{{ solicitud.creadaEn | fechaRelativa }}</span>
+          </div>
+          <p class="dato">{{ solicitud.correo }}</p>
+          <p class="dato">
+            {{ solicitud.rolSolicitado | rolLegible }}
+            @if (solicitud.facultad) {
+              · {{ solicitud.facultad }}
+            }
+            @if (solicitud.programa) {
+              · {{ solicitud.programa }}
+            }
+          </p>
+          <div class="indicadores">
+            <span class="indicador" [class.verificado]="solicitud.correoVerificado">
+              <mat-icon aria-hidden="true">{{ solicitud.correoVerificado ? 'check_circle' : 'cancel' }}</mat-icon>
+              {{ solicitud.correoVerificado ? 'Correo verificado' : 'Correo sin verificar' }}
+            </span>
+            <span class="indicador" [class.verificado]="solicitud.celularVerificado">
+              <mat-icon aria-hidden="true">{{ solicitud.celularVerificado ? 'check_circle' : 'cancel' }}</mat-icon>
+              {{ solicitud.celularVerificado ? 'Celular verificado' : 'Celular sin verificar' }}
+            </span>
+          </div>
+          <div class="acciones">
+            <button mat-stroked-button type="button" [disabled]="procesando() === solicitud.id" (click)="rechazar(solicitud)">
+              Rechazar
+            </button>
+            <button mat-flat-button type="button" [disabled]="procesando() === solicitud.id" (click)="aprobar(solicitud)">
+              Aprobar
+            </button>
+          </div>
+        </li>
+      }
+    </ul>
+  }
+</section>

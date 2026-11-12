@@ -7,6 +7,14 @@ export type Rol =
   | 'DOCENTE'
   | 'ESTUDIANTE';
 
+export const ROLES_ADMINISTRACION: readonly Rol[] = [
+  'ADMINISTRADOR',
+  'RECTOR',
+  'COORDINADOR_ACADEMICO',
+  'COORDINADOR_FACULTAD',
+  'COORDINADOR_PROGRAMA',
+];
+
 export interface SesionRespuesta {
   readonly tokenAcceso: string;
   readonly tipoToken: string;

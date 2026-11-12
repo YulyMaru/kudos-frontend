@@ -1,4 +1,4 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
@@ -12,7 +12,10 @@ import { EstadoVacio } from '../../../shared/components/estado-vacio/estado-vaci
 import { AdjuntoVista } from '../../../shared/models/kudo';
 import { RolLegiblePipe } from '../../../shared/pipes/rol-legible.pipe';
 import { TamanoArchivoPipe } from '../../../shared/pipes/tamano-archivo.pipe';
+import { Calificacion } from '../calificacion/calificacion';
 import { KudoService } from '../kudo.service';
+import { HiloReplicas } from '../replicas/hilo-replicas';
+import { BotonReportar } from '../reportar/boton-reportar';
 
 @Component({
   selector: 'app-detalle-kudo',
@@ -21,7 +24,9 @@ import { KudoService } from '../kudo.service';
     MatButtonModule,
     MatIconModule,
     DatePipe,
-    DecimalPipe,
+    Calificacion,
+    BotonReportar,
+    HiloReplicas,
     EsqueletoTarjeta,
     EstadoError,
     EstadoVacio,
@@ -41,6 +46,7 @@ export class DetalleKudo {
     params: () => this.id(),
     stream: ({ params }) => this.kudos.detalle(params),
   });
+  protected readonly replicasNuevas = signal(0);
   protected readonly abriendo = signal<string | null>(null);
   protected readonly errorAdjunto = signal<string | null>(null);
 

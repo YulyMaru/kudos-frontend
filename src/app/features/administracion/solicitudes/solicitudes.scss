@@ -1,0 +1,86 @@
+.encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .titulo-pagina {
+    margin: 0;
+  }
+}
+
+.lista {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--mat-sys-surface-container);
+}
+
+.cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+
+.nombre {
+  margin: 0;
+  font: var(--mat-sys-title-medium);
+}
+
+.fecha,
+.dato {
+  margin: 0;
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.dato {
+  font: var(--mat-sys-body-medium);
+  overflow-wrap: anywhere;
+}
+
+.indicadores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+}
+
+.indicador {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-error);
+
+  &.verificado {
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  mat-icon {
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+  }
+}
+
+.acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+
+  button {
+    min-height: 48px;
+  }
+}

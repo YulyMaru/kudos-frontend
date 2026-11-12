@@ -39,10 +39,17 @@ describe('DetalleKudo', () => {
     return (fixture.nativeElement as HTMLElement).textContent ?? '';
   }
 
+  function responderReplicas(): void {
+    http.match((peticion) => peticion.url === `${urlKudo}/replicas`).forEach((peticion) =>
+      peticion.flush({ replicas: [], siguienteCursor: null }),
+    );
+  }
+
   it('muestra el contenido completo, la categoría y los adjuntos', async () => {
     TestBed.tick();
     http.expectOne(urlKudo).flush(detalle);
     await fixture.whenStable();
+    responderReplicas();
 
     expect(texto()).toContain('Ana Docente reconoció a Diego Estudiante');
     expect(texto()).toContain('Mentor Inspirador');
@@ -51,7 +58,9 @@ describe('DetalleKudo', () => {
     );
     expect(texto()).toContain('evidencia.pdf');
     expect(texto()).toContain('2.0 KB'.replace('.', ','));
-    expect(texto()).toContain('3 réplicas');
+    expect(texto()).toContain('Réplicas (3)');
+    expect(texto()).toMatch(/4[.,]5/);
+    expect(texto()).toContain('Reportar');
   });
 
   it('pide el enlace temporal del adjunto al hacer clic y lo abre', async () => {
@@ -60,6 +69,7 @@ describe('DetalleKudo', () => {
     TestBed.tick();
     http.expectOne(urlKudo).flush(detalle);
     await fixture.whenStable();
+    responderReplicas();
 
     (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('.adjuntos button')?.click();
     http.expectOne(`${urlKudo}/adjuntos/adj1/enlace`).flush({ url: 'https://almacen/firmado', expiraEn: 'x' });
@@ -86,6 +96,7 @@ describe('DetalleKudo', () => {
     TestBed.tick();
     http.expectOne(urlKudo).flush(detalle);
     await fixture.whenStable();
+    responderReplicas();
 
     expect(texto()).toContain('Mentor Inspirador');
   });

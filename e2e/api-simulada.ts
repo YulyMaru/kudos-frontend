@@ -76,6 +76,7 @@ export async function simularApi(pagina: Page): Promise<void> {
     kudos.push(kudo);
     return responder(ruta, { id: kudo.id, fechaPublicacion: kudo.fechaPublicacion }, 201);
   });
+  await pagina.route(`${API}/kudos/*/replicas?*`, (ruta) => responder(ruta, { replicas: [], siguienteCursor: null }));
   await pagina.route(`${API}/kudos/*`, (ruta) => {
     const id = new URL(ruta.request().url()).pathname.split('/').pop();
     const kudo = kudos.find((k) => k.id === id);

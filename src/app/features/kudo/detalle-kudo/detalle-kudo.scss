@@ -41,20 +41,14 @@ h2 {
   font: var(--mat-sys-body-large);
 }
 
-.datos {
+.interacciones {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  color: var(--mat-sys-on-surface-variant);
-
-  li {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-  }
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 0;
+  border-block: 1px solid var(--mat-sys-outline-variant);
 }
 
 .adjuntos ul {

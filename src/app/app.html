@@ -16,7 +16,7 @@
         Dar Kudo
       </a>
       <mat-nav-list aria-label="Navegación principal">
-        @for (enlace of enlaces; track enlace.ruta) {
+        @for (enlace of enlaces(); track enlace.ruta) {
           <a mat-list-item [routerLink]="enlace.ruta" routerLinkActive #activo="routerLinkActive" [activated]="activo.isActive">
             <mat-icon matListItemIcon aria-hidden="true">{{ enlace.icono }}</mat-icon>
             <span matListItemTitle>{{ enlace.etiqueta }}</span>
@@ -58,7 +58,7 @@
     Dar Kudo
   </a>
   <nav class="inferior" aria-label="Navegación principal">
-    @for (enlace of enlaces; track enlace.ruta) {
+    @for (enlace of enlaces(); track enlace.ruta) {
       <a class="item-inferior" [routerLink]="enlace.ruta" routerLinkActive="activo" ariaCurrentWhenActive="page">
         <mat-icon aria-hidden="true">{{ enlace.icono }}</mat-icon>
         <span>{{ enlace.etiqueta }}</span>
