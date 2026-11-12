@@ -3,7 +3,6 @@ import {
   celularInternacional,
   contrasenasIguales,
   contrasenaSegura,
-  correoInstitucional,
   normalizarCelular,
 } from './validadores';
 
@@ -12,13 +11,6 @@ function control(valor: string): FormControl<string> {
 }
 
 describe('validadores de cuenta', () => {
-  it('exige correo del dominio institucional o sus subdominios', () => {
-    expect(correoInstitucional(control('ana@uco.edu.co'))).toBeNull();
-    expect(correoInstitucional(control('Ana@Est.UCO.edu.co'))).toBeNull();
-    expect(correoInstitucional(control('ana@gmail.com'))).toEqual({ correoInstitucional: true });
-    expect(correoInstitucional(control(''))).toBeNull();
-  });
-
   it('acepta celulares en formato internacional', () => {
     expect(celularInternacional(control('+57 300 123-4567'))).toBeNull();
     expect(celularInternacional(control('3001234567'))).toEqual({ celular: true });

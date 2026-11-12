@@ -2,23 +2,11 @@ import { AbstractControl, ValidationErrors, ValidatorFn, Validators } from '@ang
 
 export const LONGITUD_MINIMA_CONTRASENA = 12;
 export const BYTES_MAXIMOS_CONTRASENA = 72;
-export const DOMINIO_INSTITUCIONAL = 'uco.edu.co';
 export const PATRON_CELULAR = /^\+[1-9]\d{7,14}$/;
 export const PATRON_CODIGO = /^\d{6}$/;
 
 export function normalizarCelular(celular: string): string {
   return celular.replace(/[\s-]/g, '');
-}
-
-export function correoInstitucional(control: AbstractControl<string>): ValidationErrors | null {
-  const valor = control.value.trim().toLowerCase();
-  if (valor === '') {
-    return null;
-  }
-  const dominio = valor.split('@')[1] ?? '';
-  return dominio === DOMINIO_INSTITUCIONAL || dominio.endsWith(`.${DOMINIO_INSTITUCIONAL}`)
-    ? null
-    : { correoInstitucional: true };
 }
 
 export function celularInternacional(control: AbstractControl<string>): ValidationErrors | null {

@@ -17,8 +17,6 @@ import { CuentaService } from '../cuenta.service';
 import {
   celularInternacional,
   contrasenasIguales,
-  correoInstitucional,
-  DOMINIO_INSTITUCIONAL,
   LONGITUD_MINIMA_CONTRASENA,
   normalizarCelular,
   VALIDADORES_CONTRASENA,
@@ -65,14 +63,13 @@ export class Registro {
   private readonly avisos = inject(MatSnackBar);
 
   protected readonly roles = ROLES_REGISTRO;
-  protected readonly dominio = DOMINIO_INSTITUCIONAL;
   protected readonly longitudMinima = LONGITUD_MINIMA_CONTRASENA;
   protected readonly requierePrograma = requierePrograma;
   protected readonly requiereFacultad = requiereFacultad;
   protected readonly formulario = inject(NonNullableFormBuilder).group(
     {
       nombreCompleto: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(150)]],
-      correo: ['', [Validators.required, Validators.email, correoInstitucional]],
+      correo: ['', [Validators.required, Validators.email]],
       celular: ['', [Validators.required, celularInternacional]],
       rol: new FormControl<Rol | null>(null, Validators.required),
       facultadId: [''],

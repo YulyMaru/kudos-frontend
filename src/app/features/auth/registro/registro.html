@@ -17,13 +17,11 @@
     <mat-form-field appearance="outline">
       <mat-label>Correo institucional</mat-label>
       <input matInput type="email" formControlName="correo" autocomplete="email" inputmode="email" />
-      <mat-hint>Debe terminar en &#64;{{ dominio }}</mat-hint>
+      <mat-hint>Usa tu correo institucional</mat-hint>
       @if (formulario.controls.correo.hasError('required')) {
         <mat-error>Escribe tu correo institucional</mat-error>
       } @else if (formulario.controls.correo.hasError('email')) {
         <mat-error>El correo no tiene un formato válido</mat-error>
-      } @else if (formulario.controls.correo.hasError('correoInstitucional')) {
-        <mat-error>Se requiere un correo institucional (&#64;{{ dominio }})</mat-error>
       }
     </mat-form-field>
 
