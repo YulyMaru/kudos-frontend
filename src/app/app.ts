@@ -2,14 +2,16 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { map } from 'rxjs';
+import { filter, map } from 'rxjs';
 import { SesionService } from './core/auth/sesion.service';
 import { EstadoNotificaciones } from './notificaciones/estado-notificaciones/estado-notificaciones';
+import { confirmar } from './shared/components/dialogo-confirmacion/dialogo-confirmacion';
 import { ROLES_ADMINISTRACION } from './shared/models/sesion';
 import { RolLegiblePipe } from './shared/pipes/rol-legible.pipe';
 
@@ -41,6 +43,7 @@ export const CONSULTA_ESCRITORIO = '(min-width: 960px)';
 })
 export class App {
   private readonly breakpoints = inject(BreakpointObserver);
+  private readonly dialogos = inject(MatDialog);
   protected readonly sesion = inject(SesionService);
 
   protected readonly esEscritorio = toSignal(
@@ -57,6 +60,8 @@ export class App {
   });
 
   protected cerrarSesion(): void {
-    this.sesion.cerrarSesion();
+    confirmar(this.dialogos, { titulo: '¿Seguro que quieres cerrar sesión?', confirmar: 'Cerrar sesión' })
+      .pipe(filter(Boolean))
+      .subscribe(() => this.sesion.cerrarSesion());
   }
 }

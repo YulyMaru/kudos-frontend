@@ -6,6 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { mensajeDeError } from '../../../core/http/mensaje-error';
 import { ReplicaPublicada } from '../../../shared/models/interaccion';
+import { AvisosService } from '../../../shared/services/avisos.service';
 import { InteraccionesService } from '../interacciones.service';
 
 @Component({
@@ -48,6 +49,7 @@ import { InteraccionesService } from '../interacciones.service';
 })
 export class FormularioReplica {
   private readonly interacciones = inject(InteraccionesService);
+  private readonly avisos = inject(AvisosService);
 
   readonly kudoId = input.required<string>();
   readonly padreId = input<string | null>(null);
@@ -74,6 +76,7 @@ export class FormularioReplica {
           this.enviando.set(false);
           this.formulario.reset();
           this.publicada.emit(replica);
+          this.avisos.mostrar('Réplica publicada');
         },
         error: (error: unknown) => {
           this.enviando.set(false);

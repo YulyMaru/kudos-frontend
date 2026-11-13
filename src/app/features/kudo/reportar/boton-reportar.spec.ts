@@ -1,27 +1,28 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { of, throwError } from 'rxjs';
+import { AvisosService } from '../../../shared/services/avisos.service';
 import { InteraccionesService } from '../interacciones.service';
 import { BotonReportar } from './boton-reportar';
 import { DialogoReportar } from './dialogo-reportar';
 
 describe('BotonReportar', () => {
   const reportar = vi.fn();
-  const abrirAviso = vi.fn();
+  const avisos = { mostrar: vi.fn(), error: vi.fn() };
   const abrirDialogo = vi.fn();
   let fixture: ComponentFixture<BotonReportar>;
 
   beforeEach(async () => {
     reportar.mockReset();
-    abrirAviso.mockReset();
+    avisos.mostrar.mockReset();
+    avisos.error.mockReset();
     abrirDialogo.mockReset();
     await TestBed.configureTestingModule({
       imports: [BotonReportar],
       providers: [
         { provide: InteraccionesService, useValue: { reportar } },
-        { provide: MatSnackBar, useValue: { open: abrirAviso } },
+        { provide: AvisosService, useValue: avisos },
         { provide: MatDialog, useValue: { open: abrirDialogo } },
       ],
     }).compileComponents();
@@ -46,6 +47,7 @@ describe('BotonReportar', () => {
     expect(reportar).toHaveBeenCalledWith('REPLICA', 'r1', 'Contenido ofensivo');
     expect(boton().textContent).toContain('Reportado');
     expect(boton().disabled).toBe(true);
+    expect(avisos.mostrar).toHaveBeenCalledWith('Gracias. Tu reporte quedó registrado para revisión');
   });
 
   it('no reporta si se cancela el diálogo', () => {
@@ -64,7 +66,7 @@ describe('BotonReportar', () => {
 
     boton().click();
 
-    expect(abrirAviso).toHaveBeenCalledWith('Ya reportaste este contenido', 'Cerrar', { duration: 6000 });
+    expect(avisos.error).toHaveBeenCalledWith('Ya reportaste este contenido');
   });
 });
 

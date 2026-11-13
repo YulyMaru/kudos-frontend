@@ -4,14 +4,17 @@ import { Router } from '@angular/router';
 import { catchError, finalize, firstValueFrom, map, Observable, shareReplay, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { SesionRespuesta, UsuarioActual } from '../../shared/models/sesion';
+import { AvisosService } from '../../shared/services/avisos.service';
 
 export const CLAVE_TOKEN_REFRESCO = 'uco-kudos.tokenRefresco';
 export const RUTA_INICIAR_SESION = '/iniciar-sesion';
+export const MENSAJE_SESION_CERRADA = 'Sesión cerrada';
 
 @Injectable({ providedIn: 'root' })
 export class SesionService {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
+  private readonly avisos = inject(AvisosService);
   private readonly urlAutenticacion = `${environment.apiUrl}/api/v1/auth`;
   private readonly tokenAccesoActual = signal<string | null>(null);
   private readonly usuarioActual = signal<UsuarioActual | null>(null);
@@ -62,13 +65,14 @@ export class SesionService {
     }
   }
 
-  cerrarSesion(): void {
+  cerrarSesion(aviso = MENSAJE_SESION_CERRADA): void {
     const tokenRefresco = localStorage.getItem(CLAVE_TOKEN_REFRESCO);
     this.limpiar();
     if (tokenRefresco !== null) {
       this.http.post<void>(`${this.urlAutenticacion}/cerrar-sesion`, { tokenRefresco }).subscribe({ error: () => undefined });
     }
     void this.router.navigateByUrl(RUTA_INICIAR_SESION);
+    this.avisos.mostrar(aviso);
   }
 
   finalizarPorExpiracion(): void {

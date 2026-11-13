@@ -56,6 +56,24 @@ a {
   outline-offset: 2px;
 }
 
+.mat-mdc-snack-bar-container.aviso {
+  margin-bottom: calc(88px + env(safe-area-inset-bottom));
+
+  @media (min-width: 960px) {
+    margin-bottom: 24px;
+  }
+}
+
+.mat-mdc-snack-bar-container.aviso-error {
+  @include mat.snack-bar-overrides(
+    (
+      container-color: var(--mat-sys-error-container),
+      supporting-text-color: var(--mat-sys-on-error-container),
+      button-color: var(--mat-sys-error),
+    )
+  );
+}
+
 .pagina {
   width: 100%;
   max-width: 720px;

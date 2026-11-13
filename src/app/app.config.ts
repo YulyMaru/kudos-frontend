@@ -11,6 +11,7 @@ import {
 import { MatIconRegistry } from '@angular/material/icon';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { routes } from './app.routes';
+import { InactividadService } from './core/auth/inactividad.service';
 import { SesionService } from './core/auth/sesion.service';
 import { autenticacionInterceptor } from './core/http/autenticacion.interceptor';
 
@@ -24,6 +25,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withFetch(), withInterceptors([autenticacionInterceptor])),
     provideAppInitializer(() => {
       inject(MatIconRegistry).setDefaultFontSetClass('material-symbols-outlined');
+      inject(InactividadService);
       return inject(SesionService).restaurar();
     }),
   ],

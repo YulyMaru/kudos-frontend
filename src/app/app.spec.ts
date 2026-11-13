@@ -1,11 +1,13 @@
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { MatDialog } from '@angular/material/dialog';
 import { provideRouter } from '@angular/router';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 import { App } from './app';
 import { SesionService } from './core/auth/sesion.service';
 import { NotificacionesService } from './notificaciones/notificaciones.service';
+import { DialogoConfirmacion } from './shared/components/dialogo-confirmacion/dialogo-confirmacion';
 import { UsuarioActual } from './shared/models/sesion';
 
 describe('App', () => {
@@ -13,17 +15,21 @@ describe('App', () => {
   const autenticado = signal(true);
   const usuario = signal<UsuarioActual | null>({ id: '1', nombreCompleto: 'Ana Docente', rol: 'DOCENTE' });
   const cerrarSesion = vi.fn();
+  const abrirDialogo = vi.fn();
 
   beforeEach(async () => {
     autenticado.set(true);
     usuario.set({ id: '1', nombreCompleto: 'Ana Docente', rol: 'DOCENTE' });
     cerrarSesion.mockReset();
+    abrirDialogo.mockReset();
+    abrirDialogo.mockReturnValue({ afterClosed: () => of(true) });
     await TestBed.configureTestingModule({
       imports: [App],
       providers: [
         provideRouter([]),
         { provide: BreakpointObserver, useValue: { observe: () => estado } },
         { provide: SesionService, useValue: { autenticado, usuario, cerrarSesion } },
+        { provide: MatDialog, useValue: { open: abrirDialogo } },
         {
           provide: NotificacionesService,
           useValue: { estado: signal('CONECTADO'), noLeidas: signal(0), marcarLeidas: vi.fn() },
@@ -47,7 +53,27 @@ describe('App', () => {
     expect(elemento.querySelector('a.fab-kudo')?.getAttribute('href')).toBe('/kudos/nuevo');
     expect(elemento.querySelector('mat-toolbar app-estado-notificaciones')).not.toBeNull();
     elemento.querySelector<HTMLButtonElement>('button[aria-label="Cerrar sesión"]')?.click();
-    expect(cerrarSesion).toHaveBeenCalled();
+    expect(abrirDialogo).toHaveBeenCalledWith(
+      DialogoConfirmacion,
+      expect.objectContaining({
+        role: 'alertdialog',
+        data: { titulo: '¿Seguro que quieres cerrar sesión?', confirmar: 'Cerrar sesión' },
+      }),
+    );
+    expect(cerrarSesion).toHaveBeenCalledWith();
+  });
+
+  it('no cierra la sesión si se cancela la confirmación', async () => {
+    estado.next({ matches: true, breakpoints: {} });
+    const elemento = await crear();
+
+    for (const resultado of [false, undefined]) {
+      abrirDialogo.mockReturnValue({ afterClosed: () => of(resultado) });
+      elemento.querySelector<HTMLButtonElement>('button.salir')?.click();
+    }
+
+    expect(abrirDialogo).toHaveBeenCalledTimes(2);
+    expect(cerrarSesion).not.toHaveBeenCalled();
   });
 
   it('muestra la navegación lateral con el usuario y su rol en escritorio', async () => {

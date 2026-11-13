@@ -1,23 +1,24 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { of, throwError } from 'rxjs';
+import { AvisosService } from '../../../shared/services/avisos.service';
 import { InteraccionesService } from '../interacciones.service';
 import { Calificacion } from './calificacion';
 
 describe('Calificacion', () => {
   const calificar = vi.fn();
-  const abrirAviso = vi.fn();
+  const avisos = { mostrar: vi.fn(), error: vi.fn() };
   let fixture: ComponentFixture<Calificacion>;
 
   beforeEach(async () => {
     calificar.mockReset();
-    abrirAviso.mockReset();
+    avisos.mostrar.mockReset();
+    avisos.error.mockReset();
     await TestBed.configureTestingModule({
       imports: [Calificacion],
       providers: [
         { provide: InteraccionesService, useValue: { calificar } },
-        { provide: MatSnackBar, useValue: { open: abrirAviso } },
+        { provide: AvisosService, useValue: avisos },
       ],
     }).compileComponents();
     fixture = TestBed.createComponent(Calificacion);
@@ -55,6 +56,7 @@ describe('Calificacion', () => {
     expect(elemento().textContent).toContain('Tu calificación: 4');
     expect(elemento().querySelectorAll('button')[3].getAttribute('aria-pressed')).toBe('true');
     expect(elemento().querySelectorAll('mat-icon.llena').length).toBe(4);
+    expect(avisos.mostrar).toHaveBeenCalledWith('Calificación registrada');
   });
 
   it('avisa si el back-end rechaza la calificación', () => {
@@ -64,6 +66,6 @@ describe('Calificacion', () => {
 
     elemento().querySelectorAll('button')[0].click();
 
-    expect(abrirAviso).toHaveBeenCalledWith('No puedes calificar tu propio Kudo', 'Cerrar', { duration: 6000 });
+    expect(avisos.error).toHaveBeenCalledWith('No puedes calificar tu propio Kudo');
   });
 });

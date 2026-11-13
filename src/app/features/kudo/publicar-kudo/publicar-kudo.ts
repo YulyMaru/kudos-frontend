@@ -9,13 +9,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { catchError, debounceTime, distinctUntilChanged, map, of, Subject, switchMap } from 'rxjs';
 import { mensajeDeError } from '../../../core/http/mensaje-error';
 import { PersonaVista } from '../../../shared/models/kudo';
 import { RolLegiblePipe } from '../../../shared/pipes/rol-legible.pipe';
 import { TamanoArchivoPipe } from '../../../shared/pipes/tamano-archivo.pipe';
+import { AvisosService } from '../../../shared/services/avisos.service';
 import { KudoService } from '../kudo.service';
 import { ACEPTAR_ARCHIVOS, MAXIMO_ADJUNTOS, validarAdjuntos } from '../validacion-adjuntos';
 
@@ -49,7 +49,7 @@ export function personaSeleccionada(control: AbstractControl<PersonaVista | stri
 export class PublicarKudo {
   private readonly kudos = inject(KudoService);
   private readonly router = inject(Router);
-  private readonly avisos = inject(MatSnackBar);
+  private readonly avisos = inject(AvisosService);
   private readonly textoBusqueda = new Subject<string>();
 
   protected readonly aceptarArchivos = ACEPTAR_ARCHIVOS;
@@ -117,7 +117,7 @@ export class PublicarKudo {
     this.kudos.publicar({ destinatarioId: destinatario.id, categoriaId, contenido }, this.adjuntos()).subscribe({
       next: (publicado) => {
         this.enviando.set(false);
-        this.avisos.open(`¡Kudo publicado para ${destinatario.nombreCompleto}!`, 'Cerrar', { duration: 5000 });
+        this.avisos.mostrar(`¡Kudo publicado para ${destinatario.nombreCompleto}!`);
         void this.router.navigate(['/kudos', publicado.id]);
       },
       error: (error: unknown) => {

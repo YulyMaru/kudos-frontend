@@ -2,20 +2,27 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
+import { AvisosService } from '../../../shared/services/avisos.service';
 import { CuentaService } from '../cuenta.service';
 import { Restablecer } from './restablecer';
 
 describe('Restablecer', () => {
   const servicio = { solicitarRestablecimiento: vi.fn(), confirmarRestablecimiento: vi.fn() };
+  const mostrar = vi.fn();
   let fixture: ComponentFixture<Restablecer>;
   let componente: Restablecer;
 
   beforeEach(async () => {
     servicio.solicitarRestablecimiento.mockReset();
     servicio.confirmarRestablecimiento.mockReset();
+    mostrar.mockReset();
     await TestBed.configureTestingModule({
       imports: [Restablecer],
-      providers: [provideRouter([]), { provide: CuentaService, useValue: servicio }],
+      providers: [
+        provideRouter([]),
+        { provide: CuentaService, useValue: servicio },
+        { provide: AvisosService, useValue: { mostrar } },
+      ],
     }).compileComponents();
     fixture = TestBed.createComponent(Restablecer);
     componente = fixture.componentInstance;
@@ -37,6 +44,7 @@ describe('Restablecer', () => {
     expect(servicio.solicitarRestablecimiento).toHaveBeenCalledWith('ana@uco.edu.co');
     expect(texto()).toContain('Si el correo pertenece a una cuenta activa');
     expect(texto()).not.toContain('Enviar enlace');
+    expect(mostrar).not.toHaveBeenCalled();
   });
 
   it('con token exige contraseñas iguales y confirma el cambio', async () => {
@@ -54,6 +62,7 @@ describe('Restablecer', () => {
 
     expect(servicio.confirmarRestablecimiento).toHaveBeenCalledWith('tk-1', 'una-clave-larga');
     expect(texto()).toContain('Contraseña actualizada');
+    expect(mostrar).toHaveBeenCalledWith('Contraseña restablecida');
   });
 
   it('muestra el error si el enlace ya no es válido', async () => {

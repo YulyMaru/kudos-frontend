@@ -1,22 +1,11 @@
 import { FormControl, FormGroup } from '@angular/forms';
-import {
-  celularInternacional,
-  contrasenasIguales,
-  contrasenaSegura,
-  normalizarCelular,
-} from './validadores';
+import { contrasenasIguales, contrasenaSegura } from './validadores';
 
 function control(valor: string): FormControl<string> {
   return new FormControl(valor, { nonNullable: true });
 }
 
 describe('validadores de cuenta', () => {
-  it('acepta celulares en formato internacional', () => {
-    expect(celularInternacional(control('+57 300 123-4567'))).toBeNull();
-    expect(celularInternacional(control('3001234567'))).toEqual({ celular: true });
-    expect(normalizarCelular('+57 300 123-4567')).toBe('+573001234567');
-  });
-
   it('aplica la política de contraseñas del back-end', () => {
     expect(contrasenaSegura(control('corta'))).toEqual({ contrasenaCorta: true });
     expect(contrasenaSegura(control('            '))).toEqual({ contrasenaCorta: true });

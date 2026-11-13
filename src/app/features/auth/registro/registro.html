@@ -25,16 +25,7 @@
       }
     </mat-form-field>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Celular con WhatsApp</mat-label>
-      <input matInput type="tel" formControlName="celular" autocomplete="tel" inputmode="tel" placeholder="+573001234567" />
-      <mat-hint>Formato internacional, por ejemplo +573001234567</mat-hint>
-      @if (formulario.controls.celular.hasError('required')) {
-        <mat-error>Escribe tu número celular</mat-error>
-      } @else if (formulario.controls.celular.hasError('celular')) {
-        <mat-error>Usa el formato internacional, por ejemplo +573001234567</mat-error>
-      }
-    </mat-form-field>
+    <app-campo-celular formControlName="celular" etiqueta="Celular con WhatsApp" />
 
     <mat-form-field appearance="outline">
       <mat-label>Rol que solicitas</mat-label>

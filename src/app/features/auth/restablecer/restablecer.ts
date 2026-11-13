@@ -9,6 +9,7 @@ import { RouterLink } from '@angular/router';
 import { Observable } from 'rxjs';
 import { mensajeDeError } from '../../../core/http/mensaje-error';
 import { MensajeRespuesta } from '../../../shared/models/registro';
+import { AvisosService } from '../../../shared/services/avisos.service';
 import { CuentaService } from '../cuenta.service';
 import { contrasenasIguales, LONGITUD_MINIMA_CONTRASENA, VALIDADORES_CONTRASENA } from '../validadores';
 
@@ -30,6 +31,7 @@ import { contrasenasIguales, LONGITUD_MINIMA_CONTRASENA, VALIDADORES_CONTRASENA 
 export class Restablecer {
   private readonly cuentas = inject(CuentaService);
   private readonly fb = inject(NonNullableFormBuilder);
+  private readonly avisos = inject(AvisosService);
 
   readonly token = input<string>();
 
@@ -63,10 +65,10 @@ export class Restablecer {
       this.confirmacion.markAllAsTouched();
       return;
     }
-    this.ejecutar(this.cuentas.confirmarRestablecimiento(token, this.confirmacion.getRawValue().contrasena));
+    this.ejecutar(this.cuentas.confirmarRestablecimiento(token, this.confirmacion.getRawValue().contrasena), 'Contraseña restablecida');
   }
 
-  private ejecutar(operacion: Observable<MensajeRespuesta>): void {
+  private ejecutar(operacion: Observable<MensajeRespuesta>, confirmacion?: string): void {
     this.enviando.set(true);
     this.error.set(null);
     this.mensaje.set(null);
@@ -75,6 +77,9 @@ export class Restablecer {
         this.enviando.set(false);
         this.terminado.set(true);
         this.mensaje.set(respuesta.mensaje);
+        if (confirmacion !== undefined) {
+          this.avisos.mostrar(confirmacion);
+        }
       },
       error: (error: unknown) => {
         this.enviando.set(false);

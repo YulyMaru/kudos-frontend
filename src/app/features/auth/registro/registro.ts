@@ -8,19 +8,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, RouterLink } from '@angular/router';
 import { mensajeDeError } from '../../../core/http/mensaje-error';
+import { CampoCelular } from '../../../shared/components/campo-celular/campo-celular';
 import { Rol } from '../../../shared/models/sesion';
 import { RolLegiblePipe } from '../../../shared/pipes/rol-legible.pipe';
+import { AvisosService } from '../../../shared/services/avisos.service';
 import { CuentaService } from '../cuenta.service';
-import {
-  celularInternacional,
-  contrasenasIguales,
-  LONGITUD_MINIMA_CONTRASENA,
-  normalizarCelular,
-  VALIDADORES_CONTRASENA,
-} from '../validadores';
+import { contrasenasIguales, LONGITUD_MINIMA_CONTRASENA, VALIDADORES_CONTRASENA } from '../validadores';
 
 export const ROLES_REGISTRO: readonly Rol[] = [
   'ESTUDIANTE',
@@ -52,6 +47,7 @@ export function requiereFacultad(rol: Rol | null): boolean {
     MatProgressSpinnerModule,
     MatSelectModule,
     RolLegiblePipe,
+    CampoCelular,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './registro.html',
@@ -60,7 +56,7 @@ export function requiereFacultad(rol: Rol | null): boolean {
 export class Registro {
   private readonly cuentas = inject(CuentaService);
   private readonly router = inject(Router);
-  private readonly avisos = inject(MatSnackBar);
+  private readonly avisos = inject(AvisosService);
 
   protected readonly roles = ROLES_REGISTRO;
   protected readonly longitudMinima = LONGITUD_MINIMA_CONTRASENA;
@@ -70,7 +66,7 @@ export class Registro {
     {
       nombreCompleto: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(150)]],
       correo: ['', [Validators.required, Validators.email]],
-      celular: ['', [Validators.required, celularInternacional]],
+      celular: [''],
       rol: new FormControl<Rol | null>(null, Validators.required),
       facultadId: [''],
       programaId: [''],
@@ -123,7 +119,7 @@ export class Registro {
       .registrar({
         nombreCompleto: valores.nombreCompleto.trim(),
         correo,
-        celular: normalizarCelular(valores.celular),
+        celular: valores.celular,
         rol,
         facultadId: requiereFacultad(rol) ? valores.facultadId : null,
         programaId: requierePrograma(rol) ? valores.programaId : null,
@@ -133,7 +129,7 @@ export class Registro {
       .subscribe({
         next: (respuesta) => {
           this.enviando.set(false);
-          this.avisos.open(respuesta.mensaje, 'Cerrar', { duration: 8000 });
+          this.avisos.mostrar(respuesta.mensaje);
           void this.router.navigate(['/verificar'], { queryParams: { correo } });
         },
         error: (error: unknown) => {

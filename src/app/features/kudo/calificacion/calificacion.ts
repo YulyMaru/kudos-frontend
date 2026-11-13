@@ -2,9 +2,9 @@ import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { mensajeDeError } from '../../../core/http/mensaje-error';
 import { ResumenCalificacion, TipoContenido } from '../../../shared/models/interaccion';
+import { AvisosService } from '../../../shared/services/avisos.service';
 import { InteraccionesService } from '../interacciones.service';
 
 export const VALORES_CALIFICACION: readonly number[] = [1, 2, 3, 4, 5];
@@ -65,7 +65,7 @@ export const VALORES_CALIFICACION: readonly number[] = [1, 2, 3, 4, 5];
 })
 export class Calificacion {
   private readonly interacciones = inject(InteraccionesService);
-  private readonly avisos = inject(MatSnackBar);
+  private readonly avisos = inject(AvisosService);
 
   readonly tipo = input.required<TipoContenido>();
   readonly contenidoId = input.required<string>();
@@ -86,10 +86,11 @@ export class Calificacion {
       next: (resumen) => {
         this.guardando.set(false);
         this.resumen.set(resumen);
+        this.avisos.mostrar('Calificación registrada');
       },
       error: (error: unknown) => {
         this.guardando.set(false);
-        this.avisos.open(mensajeDeError(error), 'Cerrar', { duration: 6000 });
+        this.avisos.error(mensajeDeError(error));
       },
     });
   }

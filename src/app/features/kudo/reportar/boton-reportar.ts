@@ -2,10 +2,10 @@ import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angu
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { filter, switchMap } from 'rxjs';
 import { mensajeDeError } from '../../../core/http/mensaje-error';
 import { TipoContenido } from '../../../shared/models/interaccion';
+import { AvisosService } from '../../../shared/services/avisos.service';
 import { InteraccionesService } from '../interacciones.service';
 import { DialogoReportar } from './dialogo-reportar';
 
@@ -29,7 +29,7 @@ import { DialogoReportar } from './dialogo-reportar';
 export class BotonReportar {
   private readonly dialogos = inject(MatDialog);
   private readonly interacciones = inject(InteraccionesService);
-  private readonly avisos = inject(MatSnackBar);
+  private readonly avisos = inject(AvisosService);
 
   readonly tipo = input.required<TipoContenido>();
   readonly contenidoId = input.required<string>();
@@ -52,9 +52,9 @@ export class BotonReportar {
       .subscribe({
         next: () => {
           this.reportado.set(true);
-          this.avisos.open('Gracias. Tu reporte quedó registrado para revisión', 'Cerrar', { duration: 6000 });
+          this.avisos.mostrar('Gracias. Tu reporte quedó registrado para revisión');
         },
-        error: (error: unknown) => this.avisos.open(mensajeDeError(error), 'Cerrar', { duration: 6000 }),
+        error: (error: unknown) => this.avisos.error(mensajeDeError(error)),
       });
   }
 }

@@ -1,9 +1,9 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { provideRouter, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { PersonaVista } from '../../../shared/models/kudo';
+import { AvisosService } from '../../../shared/services/avisos.service';
 import { KudoService } from '../kudo.service';
 import { ESPERA_BUSQUEDA_MS, personaSeleccionada, PublicarKudo } from './publicar-kudo';
 
@@ -14,7 +14,7 @@ describe('PublicarKudo', () => {
     buscarUsuarios: vi.fn(),
     publicar: vi.fn(),
   };
-  const abrirAviso = vi.fn();
+  const avisos = { mostrar: vi.fn(), error: vi.fn() };
   let fixture: ComponentFixture<PublicarKudo>;
   let componente: PublicarKudo;
   let router: Router;
@@ -23,13 +23,14 @@ describe('PublicarKudo', () => {
     servicio.categorias.mockReturnValue(of([{ id: 'c1', nombre: 'Liderazgo' }]));
     servicio.buscarUsuarios.mockReturnValue(of([diego]));
     servicio.publicar.mockReset();
-    abrirAviso.mockReset();
+    avisos.mostrar.mockReset();
+    avisos.error.mockReset();
     await TestBed.configureTestingModule({
       imports: [PublicarKudo],
       providers: [
         provideRouter([]),
         { provide: KudoService, useValue: servicio },
-        { provide: MatSnackBar, useValue: { open: abrirAviso } },
+        { provide: AvisosService, useValue: avisos },
       ],
     }).compileComponents();
     router = TestBed.inject(Router);
@@ -68,7 +69,7 @@ describe('PublicarKudo', () => {
       { destinatarioId: 'd1', categoriaId: 'c1', contenido: 'Gracias por tu apoyo' },
       [],
     );
-    expect(abrirAviso).toHaveBeenCalledWith('¡Kudo publicado para Diego Estudiante!', 'Cerrar', { duration: 5000 });
+    expect(avisos.mostrar).toHaveBeenCalledWith('¡Kudo publicado para Diego Estudiante!');
     expect(router.navigate).toHaveBeenCalledWith(['/kudos', 'k1']);
   });
 

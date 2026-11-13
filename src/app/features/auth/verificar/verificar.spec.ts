@@ -2,20 +2,27 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
+import { AvisosService } from '../../../shared/services/avisos.service';
 import { CuentaService } from '../cuenta.service';
 import { Verificar } from './verificar';
 
 describe('Verificar', () => {
   const servicio = { verificar: vi.fn(), reenviarCodigo: vi.fn() };
+  const mostrar = vi.fn();
   let fixture: ComponentFixture<Verificar>;
   let componente: Verificar;
 
   beforeEach(async () => {
     servicio.verificar.mockReset();
     servicio.reenviarCodigo.mockReset();
+    mostrar.mockReset();
     await TestBed.configureTestingModule({
       imports: [Verificar],
-      providers: [provideRouter([]), { provide: CuentaService, useValue: servicio }],
+      providers: [
+        provideRouter([]),
+        { provide: CuentaService, useValue: servicio },
+        { provide: AvisosService, useValue: { mostrar } },
+      ],
     }).compileComponents();
     fixture = TestBed.createComponent(Verificar);
     componente = fixture.componentInstance;
@@ -48,6 +55,8 @@ describe('Verificar', () => {
     expect(servicio.verificar).toHaveBeenCalledWith('ana@uco.edu.co', 'CORREO', '123456');
     expect(servicio.verificar).toHaveBeenCalledWith('ana@uco.edu.co', 'CELULAR', '654321');
     expect(texto()).toContain('Tus datos quedaron verificados');
+    expect(mostrar).toHaveBeenCalledTimes(2);
+    expect(mostrar).toHaveBeenCalledWith('Código verificado');
   });
 
   it('muestra el rechazo del código y permite reenviarlo', async () => {
@@ -60,6 +69,7 @@ describe('Verificar', () => {
     componente['verificar']('CELULAR');
     await fixture.whenStable();
     expect(texto()).toContain('El código expiró o es incorrecto');
+    expect(mostrar).not.toHaveBeenCalled();
 
     componente['reenviar']('CELULAR');
     await fixture.whenStable();

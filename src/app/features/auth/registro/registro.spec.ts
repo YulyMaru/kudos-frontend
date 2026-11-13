@@ -1,8 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { provideRouter, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
+import { AvisosService } from '../../../shared/services/avisos.service';
 import { CuentaService } from '../cuenta.service';
 import { Registro, requiereFacultad, requierePrograma } from './registro';
 
@@ -12,7 +12,7 @@ describe('Registro', () => {
     programas: vi.fn(() => of([{ id: 'p1', facultadId: 'f1', nombre: 'Sistemas', activo: true }])),
     registrar: vi.fn(),
   };
-  const abrirAviso = vi.fn();
+  const avisos = { mostrar: vi.fn(), error: vi.fn() };
   let fixture: ComponentFixture<Registro>;
   let componente: Registro;
   let router: Router;
@@ -25,7 +25,7 @@ describe('Registro', () => {
       providers: [
         provideRouter([]),
         { provide: CuentaService, useValue: servicio },
-        { provide: MatSnackBar, useValue: { open: abrirAviso } },
+        { provide: AvisosService, useValue: avisos },
       ],
     }).compileComponents();
     router = TestBed.inject(Router);
@@ -43,7 +43,7 @@ describe('Registro', () => {
     formulario().patchValue({
       nombreCompleto: ' Ana Pérez ',
       correo: 'Ana@UCO.edu.co',
-      celular: '+57 300 123 4567',
+      celular: '+573001234567',
       rol: 'ESTUDIANTE',
     });
     formulario().controls.facultadId.setValue('f1');
@@ -101,7 +101,7 @@ describe('Registro', () => {
       contrasena: 'una-clave-larga',
       aceptaPolitica: true,
     });
-    expect(abrirAviso).toHaveBeenCalledWith('Solicitud registrada', 'Cerrar', { duration: 8000 });
+    expect(avisos.mostrar).toHaveBeenCalledWith('Solicitud registrada');
     expect(router.navigate).toHaveBeenCalledWith(['/verificar'], { queryParams: { correo: 'ana@uco.edu.co' } });
   });
 

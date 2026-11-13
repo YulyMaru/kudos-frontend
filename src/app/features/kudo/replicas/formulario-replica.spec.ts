@@ -1,18 +1,24 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
+import { AvisosService } from '../../../shared/services/avisos.service';
 import { InteraccionesService } from '../interacciones.service';
 import { FormularioReplica } from './formulario-replica';
 
 describe('FormularioReplica', () => {
   const publicarReplica = vi.fn();
+  const mostrar = vi.fn();
   let fixture: ComponentFixture<FormularioReplica>;
 
   beforeEach(async () => {
     publicarReplica.mockReset();
+    mostrar.mockReset();
     await TestBed.configureTestingModule({
       imports: [FormularioReplica],
-      providers: [{ provide: InteraccionesService, useValue: { publicarReplica } }],
+      providers: [
+        { provide: InteraccionesService, useValue: { publicarReplica } },
+        { provide: AvisosService, useValue: { mostrar } },
+      ],
     }).compileComponents();
     fixture = TestBed.createComponent(FormularioReplica);
     fixture.componentRef.setInput('kudoId', 'k1');
@@ -46,6 +52,7 @@ describe('FormularioReplica', () => {
 
     expect(publicarReplica).toHaveBeenCalledWith('k1', 'Gracias', null);
     expect(emitidas).toEqual([replica]);
+    expect(mostrar).toHaveBeenCalledWith('Réplica publicada');
     expect(fixture.componentInstance['formulario'].getRawValue().contenido).toBe('');
   });
 

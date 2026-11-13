@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { filter, Observable } from 'rxjs';
 import { mensajeDeError } from '../../../core/http/mensaje-error';
 import { EsqueletoTarjeta } from '../../../shared/components/esqueleto-tarjeta/esqueleto-tarjeta';
@@ -11,6 +10,7 @@ import { EstadoVacio } from '../../../shared/components/estado-vacio/estado-vaci
 import { SolicitudPendiente } from '../../../shared/models/solicitud';
 import { FechaRelativaPipe } from '../../../shared/pipes/fecha-relativa.pipe';
 import { RolLegiblePipe } from '../../../shared/pipes/rol-legible.pipe';
+import { AvisosService } from '../../../shared/services/avisos.service';
 import { DialogoRechazar } from './dialogo-rechazar';
 import { SolicitudesService } from './solicitudes.service';
 
@@ -24,7 +24,7 @@ import { SolicitudesService } from './solicitudes.service';
 export class Solicitudes {
   private readonly solicitudesApi = inject(SolicitudesService);
   private readonly dialogos = inject(MatDialog);
-  private readonly avisos = inject(MatSnackBar);
+  private readonly avisos = inject(AvisosService);
 
   protected readonly solicitudes = signal<readonly SolicitudPendiente[]>([]);
   protected readonly cargando = signal(true);
@@ -75,11 +75,11 @@ export class Solicitudes {
       next: () => {
         this.procesando.set(null);
         this.solicitudes.update((actuales) => actuales.filter((s) => s.id !== solicitud.id));
-        this.avisos.open(confirmacion, 'Cerrar', { duration: 4000 });
+        this.avisos.mostrar(confirmacion);
       },
       error: (error: unknown) => {
         this.procesando.set(null);
-        this.avisos.open(mensajeDeError(error), 'Cerrar', { duration: 6000 });
+        this.avisos.error(mensajeDeError(error));
       },
     });
   }

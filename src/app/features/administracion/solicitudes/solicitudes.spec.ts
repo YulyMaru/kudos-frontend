@@ -1,9 +1,9 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, of, throwError } from 'rxjs';
 import { SolicitudPendiente } from '../../../shared/models/solicitud';
+import { AvisosService } from '../../../shared/services/avisos.service';
 import { DialogoRechazar } from './dialogo-rechazar';
 import { Solicitudes } from './solicitudes';
 import { SolicitudesService } from './solicitudes.service';
@@ -22,20 +22,21 @@ describe('Solicitudes', () => {
     creadaEn: new Date().toISOString(),
   };
   const servicio = { listar: vi.fn(), aprobar: vi.fn(), rechazar: vi.fn() };
-  const abrirAviso = vi.fn();
+  const avisos = { mostrar: vi.fn(), error: vi.fn() };
   const abrirDialogo = vi.fn();
   let fixture: ComponentFixture<Solicitudes>;
 
   beforeEach(async () => {
     Object.values(servicio).forEach((simulado) => simulado.mockReset());
-    abrirAviso.mockReset();
+    avisos.mostrar.mockReset();
+    avisos.error.mockReset();
     abrirDialogo.mockReset();
     servicio.listar.mockReturnValue(of([solicitud]));
     await TestBed.configureTestingModule({
       imports: [Solicitudes],
       providers: [
         { provide: SolicitudesService, useValue: servicio },
-        { provide: MatSnackBar, useValue: { open: abrirAviso } },
+        { provide: AvisosService, useValue: avisos },
         { provide: MatDialog, useValue: { open: abrirDialogo } },
       ],
     }).compileComponents();
@@ -108,7 +109,7 @@ describe('Solicitudes', () => {
 
     expect(servicio.aprobar).toHaveBeenCalledWith('s1');
     expect(texto()).toContain('No hay solicitudes pendientes');
-    expect(abrirAviso).toHaveBeenCalledWith('Solicitud aprobada', 'Cerrar', { duration: 4000 });
+    expect(avisos.mostrar).toHaveBeenCalledWith('Solicitud aprobada');
   });
 
   it('rechaza con el motivo del diálogo, quita la tarjeta y confirma', async () => {
@@ -122,7 +123,7 @@ describe('Solicitudes', () => {
     expect(abrirDialogo).toHaveBeenCalledWith(DialogoRechazar, expect.objectContaining({ data: 'Ana Docente' }));
     expect(servicio.rechazar).toHaveBeenCalledWith('s1', 'Datos incompletos');
     expect(texto()).toContain('No hay solicitudes pendientes');
-    expect(abrirAviso).toHaveBeenCalledWith('Solicitud rechazada', 'Cerrar', { duration: 4000 });
+    expect(avisos.mostrar).toHaveBeenCalledWith('Solicitud rechazada');
   });
 
   it('no rechaza si se cancela el diálogo', async () => {
@@ -144,7 +145,7 @@ describe('Solicitudes', () => {
     botonCon('Aprobar').click();
     await fixture.whenStable();
 
-    expect(abrirAviso).toHaveBeenCalledWith('La solicitud ya fue resuelta', 'Cerrar', { duration: 6000 });
+    expect(avisos.error).toHaveBeenCalledWith('La solicitud ya fue resuelta');
     expect(texto()).toContain('Ana Docente');
   });
 });

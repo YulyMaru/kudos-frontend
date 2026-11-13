@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { RouterLink } from '@angular/router';
 import { mensajeDeError } from '../../../core/http/mensaje-error';
 import { CanalVerificacion } from '../../../shared/models/registro';
+import { AvisosService } from '../../../shared/services/avisos.service';
 import { CuentaService } from '../cuenta.service';
 import { PATRON_CODIGO } from '../validadores';
 
@@ -41,6 +42,7 @@ export const CANALES: readonly DescripcionCanal[] = [
 export class Verificar implements OnInit {
   private readonly cuentas = inject(CuentaService);
   private readonly fb = inject(NonNullableFormBuilder);
+  private readonly avisos = inject(AvisosService);
 
   readonly correo = input<string>();
 
@@ -71,7 +73,10 @@ export class Verificar implements OnInit {
     }
     this.actualizar(canal, { ocupado: true, mensaje: null, error: null });
     this.cuentas.verificar(this.correoNormalizado(), canal, control.value.trim()).subscribe({
-      next: (respuesta) => this.actualizar(canal, { ocupado: false, verificado: true, mensaje: respuesta.mensaje }),
+      next: (respuesta) => {
+        this.actualizar(canal, { ocupado: false, verificado: true, mensaje: respuesta.mensaje });
+        this.avisos.mostrar('Código verificado');
+      },
       error: (error: unknown) => this.actualizar(canal, { ocupado: false, error: mensajeDeError(error) }),
     });
   }

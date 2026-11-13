@@ -4,7 +4,8 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { SesionRespuesta } from '../../shared/models/sesion';
-import { CLAVE_TOKEN_REFRESCO, SesionService } from './sesion.service';
+import { AvisosService } from '../../shared/services/avisos.service';
+import { CLAVE_TOKEN_REFRESCO, MENSAJE_SESION_CERRADA, SesionService } from './sesion.service';
 
 export function sesionDePrueba(sufijo = '1'): SesionRespuesta {
   return {
@@ -24,11 +25,18 @@ describe('SesionService', () => {
   let servicio: SesionService;
   let http: HttpTestingController;
   let router: Router;
+  const mostrar = vi.fn();
 
   beforeEach(() => {
     localStorage.clear();
+    mostrar.mockReset();
     TestBed.configureTestingModule({
-      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideRouter([]),
+        { provide: AvisosService, useValue: { mostrar } },
+      ],
     });
     servicio = TestBed.inject(SesionService);
     http = TestBed.inject(HttpTestingController);
@@ -107,6 +115,14 @@ describe('SesionService', () => {
     peticion.flush(null, { status: 204, statusText: 'No Content' });
     expect(servicio.autenticado()).toBe(false);
     expect(localStorage.getItem(CLAVE_TOKEN_REFRESCO)).toBeNull();
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/iniciar-sesion');
+    expect(mostrar).toHaveBeenCalledWith(MENSAJE_SESION_CERRADA);
+  });
+
+  it('cerrar sesión puede mostrar un aviso distinto', () => {
+    servicio.cerrarSesion('Tu sesión se cerró por inactividad');
+
+    expect(mostrar).toHaveBeenCalledWith('Tu sesión se cerró por inactividad');
     expect(router.navigateByUrl).toHaveBeenCalledWith('/iniciar-sesion');
   });
 });
