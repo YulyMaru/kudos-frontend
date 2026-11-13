@@ -35,7 +35,7 @@ export function separarCelular(valor: string, actual: Pais): CelularSeparado {
   }
   const pais = candidatos.includes(actual)
     ? actual
-    : candidatos.reduce((elegido, opcion) => (opcion.indicativo.length > elegido.indicativo.length ? opcion : elegido));
+    : candidatos.reduce((elegido, opcion) => (opcion.indicativo.length > elegido.indicativo.length ? opcion : elegido), candidatos[0]);
   return { pais, numero: digitos.slice(pais.indicativo.length) };
 }
 
