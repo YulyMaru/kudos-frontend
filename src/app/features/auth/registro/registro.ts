@@ -130,7 +130,7 @@ export class Registro {
         next: (respuesta) => {
           this.enviando.set(false);
           this.avisos.mostrar(respuesta.mensaje);
-          void this.router.navigate(['/verificar'], { queryParams: { correo } });
+          void this.router.navigate(['/inicia-sesion'] )//, { queryParams: { correo } });
         },
         error: (error: unknown) => {
           this.enviando.set(false);
